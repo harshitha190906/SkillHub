@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
+from models.user import User
 
 auth = Blueprint("auth", __name__)
 
@@ -23,20 +24,12 @@ def register():
         if password != confirm:
             return "Passwords do not match"
 
-        hashed_password = generate_password_hash(password)
+        existing = User.get_user_by_email(mysql, email)
 
-        cursor = mysql.connection.cursor()
+        if existing:
+            return "Email already exists"
 
-        cursor.execute(
-            """
-            INSERT INTO users(fullname, email, password)
-            VALUES(%s, %s, %s)
-            """,
-            (fullname, email, hashed_password)
-        )
-
-        mysql.connection.commit()
-        cursor.close()
+        User.create_user(mysql, fullname, email, password)
 
         return redirect(url_for("auth.login"))
 
@@ -51,15 +44,7 @@ def login():
         email = request.form["email"]
         password = request.form["password"]
 
-        cursor = mysql.connection.cursor()
-
-        cursor.execute(
-            "SELECT id, fullname, email, password FROM users WHERE email=%s",
-            (email,)
-        )
-
-        user = cursor.fetchone()
-        cursor.close()
+        user = User.get_user_by_email(mysql, email)
 
         if user and check_password_hash(user[3], password):
 
@@ -71,6 +56,7 @@ def login():
         return "Invalid Email or Password"
 
     return render_template("login.html")
+
 
 @auth.route("/logout")
 def logout():
