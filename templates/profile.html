@@ -1,0 +1,122 @@
+{% extends "layout.html" %}
+
+{% block title %}
+My Profile
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body p-5">
+
+                    <div class="text-center">
+
+                        <img
+                            src="{{ url_for('static', filename='images/avatar.png') }}"
+                            class="rounded-circle shadow mb-3"
+                            width="150"
+                            height="150"
+                            alt="Profile Picture">
+
+                        <h2>{{ session.get('fullname', 'User') }}</h2>
+
+                        <p class="text-muted">
+                            Student | SkillHub User
+                        </p>
+
+                    </div>
+
+                    <hr>
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <h6 class="text-muted">
+                                Full Name
+                            </h6>
+
+                            <p class="fw-bold">
+                                {{ session.get('fullname') }}
+                            </p>
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <h6 class="text-muted">
+                                Email
+                            </h6>
+
+                            <p class="fw-bold">
+                                {{ session.get('email', 'Not Available') }}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <h6 class="text-muted">
+                                Role
+                            </h6>
+
+                            <p class="fw-bold">
+                                Student
+                            </p>
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <h6 class="text-muted">
+                                Account Status
+                            </h6>
+
+                            <span class="badge bg-success">
+                                Active
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="mt-4 d-flex justify-content-between">
+
+                        <a href="{{ url_for('dashboard') }}"
+                           class="btn btn-secondary">
+
+                            ← Dashboard
+
+                        </a>
+
+                        <a href="{{ url_for('profile_edit') }}"
+                           class="btn btn-primary">
+
+                            ✏ Edit Profile
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

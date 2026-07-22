@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Upload Certificate
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body p-4">
+
+                    <h2 class="text-center mb-4">
+                        📄 Upload Certificate
+                    </h2>
+
+                    <form method="POST" enctype="multipart/form-data">
+
+                        <!-- Certificate Title -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Certificate Title
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                name="title"
+                                placeholder="Enter certificate title"
+                                required>
+
+                        </div>
+
+                        <!-- Upload File -->
+                        <div class="mb-4">
+
+                            <label class="form-label">
+                                Select Certificate
+                            </label>
+
+                            <input
+                                type="file"
+                                class="form-control"
+                                name="certificate"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                required>
+
+                            <small class="text-muted">
+                                Supported formats: PDF, JPG, JPEG, PNG
+                            </small>
+
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-between">
+
+                            <a href="{{ url_for('certificate.view_certificates') }}"
+                               class="btn btn-secondary">
+
+                                ← Cancel
+
+                            </a>
+
+                            <button
+                                type="submit"
+                                class="btn btn-success">
+
+                                <i class="bi bi-upload"></i>
+
+                                Upload Certificate
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

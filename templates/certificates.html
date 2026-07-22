@@ -1,0 +1,129 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Certificates
+{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <h2>📄 My Certificates</h2>
+
+    <a href="{{ url_for('certificate.upload_certificate') }}"
+       class="btn btn-success">
+        ➕ Upload Certificate
+    </a>
+
+</div>
+
+<div class="row mb-4">
+
+    <div class="col-md-6">
+
+        <input
+            type="text"
+            id="searchCertificate"
+            class="form-control"
+            placeholder="🔍 Search Certificates">
+
+    </div>
+
+</div>
+
+<div class="card shadow">
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle">
+
+                <thead class="table-dark">
+
+                    <tr>
+
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>Certificate</th>
+                        <th class="text-center">Actions</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% if certificates %}
+
+                        {% for certificate in certificates %}
+
+                        <tr>
+
+                            <td>{{ loop.index }}</td>
+
+                            <td>
+                                {{ certificate[2] }}
+                            </td>
+
+                            <td>
+
+                                <a href="{{ url_for('static', filename='uploads/' ~ certificate[3]) }}"
+                                   target="_blank"
+                                   class="btn btn-info btn-sm">
+
+                                    👁 View
+
+                                </a>
+
+                            </td>
+
+                            <td class="text-center">
+
+                                <a href="{{ url_for('static', filename='uploads/' ~ certificate[3]) }}"
+                                   download
+                                   class="btn btn-primary btn-sm">
+
+                                    ⬇ Download
+
+                                </a>
+
+                                <a href="{{ url_for('certificate.delete_certificate', certificate_id=certificate[0]) }}"
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Delete this certificate?')">
+
+                                    🗑 Delete
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <tr>
+
+                            <td colspan="4" class="text-center text-muted py-4">
+
+                                No certificates uploaded yet.
+
+                            </td>
+
+                        </tr>
+
+                    {% endif %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
