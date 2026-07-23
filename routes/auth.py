@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import check_password_hash
 from models.user import User
 
@@ -19,21 +19,32 @@ def register():
 
     if request.method == "POST":
 
-        fullname = request.form["fullname"]
-        email = request.form["email"]
+        fullname = request.form["fullname"].strip()
+        email = request.form["email"].strip()
         password = request.form["password"]
         confirm = request.form["confirm_password"]
 
         if password != confirm:
-            return "Passwords do not match"
+            flash("Passwords do not match!", "danger")
+            return redirect(url_for("auth.register"))
 
-        # Check whether username already exists
-        existing = User.get_user_by_fullname(mysql, fullname)
+        # Check if username already exists
+        existing_user = User.get_user_by_fullname(mysql, fullname)
 
-        if existing:
-            return "Username already exists"
+        if existing_user:
+            flash("Username already exists!", "warning")
+            return redirect(url_for("auth.register"))
+
+        # Check if email already exists
+        existing_email = User.get_user_by_email(mysql, email)
+
+        if existing_email:
+            flash("Email already exists!", "warning")
+            return redirect(url_for("auth.register"))
 
         User.create_user(mysql, fullname, email, password)
+
+        flash("Registration Successful. Please Login.", "success")
 
         return redirect(url_for("auth.login"))
 
@@ -47,20 +58,26 @@ def login():
 
     if request.method == "POST":
 
-        fullname = request.form["fullname"]
+        fullname = request.form["fullname"].strip()
         password = request.form["password"]
 
         user = User.get_user_by_fullname(mysql, fullname)
 
-        if user and check_password_hash(user[3], password):
+        if user:
 
-            session["user_id"] = user[0]
-            session["fullname"] = user[1]
-            session["email"] = user[2]
+            if check_password_hash(user[3], password):
 
-            return redirect(url_for("dashboard"))
+                session["user_id"] = user[0]
+                session["fullname"] = user[1]
+                session["email"] = user[2]
 
-        return "Invalid Username or Password"
+                flash(f"Welcome {user[1]}!", "success")
+
+                return redirect(url_for("dashboard"))
+
+        flash("Invalid Username or Password!", "danger")
+
+        return redirect(url_for("auth.login"))
 
     return render_template("login.html")
 
@@ -71,5 +88,7 @@ def login():
 def logout():
 
     session.clear()
+
+    flash("Logged out successfully.", "success")
 
     return redirect(url_for("auth.login"))
