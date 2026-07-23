@@ -45,7 +45,7 @@
             Skills
         </a>
 
-        <a href="{{ url_for('certificate.view_certificates') }}">
+        <a href="{{ url_for('certificate.certificates') }}">
             <i class="bi bi-award"></i>
             Certificates
         </a>
@@ -75,15 +75,15 @@
 
             <div class="container-fluid">
 
-                <span class="navbar-brand fw-bold">
+                <span class="navbar-brand fw-bold welcome-text">
 
                     Welcome,
-                    {{ session.get('fullname', 'User') }}
-                    👋
+                    {{ session.get('fullname', 'User') }} 👋
 
                 </span>
 
                 <button
+                    id="themeButton"
                     class="btn btn-outline-dark"
                     onclick="toggleTheme()">
 

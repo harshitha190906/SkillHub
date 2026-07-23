@@ -6,10 +6,13 @@ auth = Blueprint("auth", __name__)
 
 mysql = None
 
+
 def init_mysql(db):
     global mysql
     mysql = db
 
+
+# ---------------- REGISTER ---------------- #
 
 @auth.route("/register", methods=["GET", "POST"])
 def register():
@@ -24,10 +27,11 @@ def register():
         if password != confirm:
             return "Passwords do not match"
 
-        existing = User.get_user_by_email(mysql, email)
+        # Check whether username already exists
+        existing = User.get_user_by_fullname(mysql, fullname)
 
         if existing:
-            return "Email already exists"
+            return "Username already exists"
 
         User.create_user(mysql, fullname, email, password)
 
@@ -36,27 +40,32 @@ def register():
     return render_template("register.html")
 
 
+# ---------------- LOGIN ---------------- #
+
 @auth.route("/login", methods=["GET", "POST"])
 def login():
 
     if request.method == "POST":
 
-        email = request.form["email"]
+        fullname = request.form["fullname"]
         password = request.form["password"]
 
-        user = User.get_user_by_email(mysql, email)
+        user = User.get_user_by_fullname(mysql, fullname)
 
         if user and check_password_hash(user[3], password):
 
             session["user_id"] = user[0]
             session["fullname"] = user[1]
+            session["email"] = user[2]
 
             return redirect(url_for("dashboard"))
 
-        return "Invalid Email or Password"
+        return "Invalid Username or Password"
 
     return render_template("login.html")
 
+
+# ---------------- LOGOUT ---------------- #
 
 @auth.route("/logout")
 def logout():

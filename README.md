@@ -236,19 +236,7 @@ UPLOAD_FOLDER=static/uploads
 - Docker Support
 - Deployment on Render/AWS
 
----
 
-## 👩‍💻 Developer
-
-**Harshitha Bantrothu**
-
-Python Full Stack Developer
-
-GitHub: https://github.com/YOUR_USERNAME
-
-LinkedIn: https://linkedin.com/in/YOUR_PROFILE
-
----
 
 ## 📄 License
 

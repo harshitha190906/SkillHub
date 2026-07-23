@@ -50,7 +50,7 @@ Dashboard
     </div>
 
     <div class="col-md-3 mb-2">
-        <a href="{{ url_for('certificate.view_certificates') }}" class="btn btn-warning w-100">
+        <a href="{{ url_for('certificate.certificates') }}" class="btn btn-warning w-100">
             📄 Certificates
         </a>
     </div>
@@ -75,11 +75,11 @@ Dashboard
                 <h4 class="mb-3">📈 Skill Levels</h4>
 
                 {% if labels and values %}
-                    <canvas id="skillChart"></canvas>
+                <canvas id="skillChart"></canvas>
                 {% else %}
-                    <p class="text-muted text-center">
-                        No skill data available.
-                    </p>
+                <p class="text-muted text-center">
+                    No skill data available.
+                </p>
                 {% endif %}
 
             </div>
@@ -97,11 +97,11 @@ Dashboard
                 <h4 class="mb-3">🥧 Skill Distribution</h4>
 
                 {% if labels and values %}
-                    <canvas id="pieChart"></canvas>
+                <canvas id="pieChart"></canvas>
                 {% else %}
-                    <p class="text-muted text-center">
-                        No skill data available.
-                    </p>
+                <p class="text-muted text-center">
+                    No skill data available.
+                </p>
                 {% endif %}
 
             </div>
@@ -145,6 +145,7 @@ Dashboard
 {% if labels and values %}
 
 <script>
+
 const labels = JSON.parse('{{ labels | tojson | safe }}');
 const values = JSON.parse('{{ values | tojson | safe }}');
 
@@ -154,47 +155,30 @@ new Chart(document.getElementById("skillChart"), {
     type: "bar",
 
     data: {
-
         labels: labels,
-
         datasets: [{
-
             label: "Skills",
-
             data: values,
-
             backgroundColor: [
                 "#0d6efd",
                 "#198754",
                 "#ffc107"
             ]
-
         }]
-
     },
 
     options: {
-
         responsive: true,
-
         plugins: {
-
             legend: {
                 display: false
             }
-
         },
-
         scales: {
-
             y: {
-
                 beginAtZero: true
-
             }
-
         }
-
     }
 
 });
@@ -205,27 +189,19 @@ new Chart(document.getElementById("pieChart"), {
     type: "pie",
 
     data: {
-
         labels: labels,
-
         datasets: [{
-
             data: values,
-
             backgroundColor: [
                 "#0d6efd",
                 "#198754",
                 "#ffc107"
             ]
-
         }]
-
     },
 
     options: {
-
         responsive: true
-
     }
 
 });

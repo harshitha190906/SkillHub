@@ -14,22 +14,35 @@ My Skills
        class="btn btn-success">
 
         <i class="bi bi-plus-circle"></i>
-
         Add Skill
 
     </a>
 
 </div>
 
+<!-- Search & Filter -->
 <div class="row mb-4">
 
-    <div class="col-md-6">
+    <div class="col-md-6 mb-2">
 
         <input
             type="text"
             id="searchSkill"
             class="form-control"
-            placeholder="🔍 Search Skills">
+            placeholder="🔍 Search Skill">
+
+    </div>
+
+    <div class="col-md-3 mb-2">
+
+        <select id="levelFilter" class="form-select">
+
+            <option value="">All Levels</option>
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+
+        </select>
 
     </div>
 
@@ -46,102 +59,94 @@ My Skills
                 <thead class="table-dark">
 
                     <tr>
-
                         <th>#</th>
                         <th>Skill</th>
                         <th>Level</th>
                         <th>Description</th>
                         <th class="text-center">Actions</th>
-
                     </tr>
 
                 </thead>
 
                 <tbody>
 
-                    {% if skills %}
+                {% if skills %}
 
-                        {% for skill in skills %}
+                    {% for skill in skills %}
 
-                        <tr>
+                    <tr>
 
-                            <td>{{ loop.index }}</td>
+                        <td>{{ loop.index }}</td>
 
-                            <td>
+                        <td>
+                            <strong>{{ skill[2] }}</strong>
+                        </td>
 
-                                <strong>{{ skill[2] }}</strong>
+                        <td>
 
-                            </td>
+                            {% if skill[3] == "Beginner" %}
 
-                            <td>
+                                <span class="badge bg-success">
+                                    {{ skill[3] }}
+                                </span>
 
-                                {% if skill[3] == "Beginner" %}
+                            {% elif skill[3] == "Intermediate" %}
 
-                                    <span class="badge bg-success">
-                                        {{ skill[3] }}
-                                    </span>
+                                <span class="badge bg-warning text-dark">
+                                    {{ skill[3] }}
+                                </span>
 
-                                {% elif skill[3] == "Intermediate" %}
+                            {% else %}
 
-                                    <span class="badge bg-warning text-dark">
-                                        {{ skill[3] }}
-                                    </span>
+                                <span class="badge bg-danger">
+                                    {{ skill[3] }}
+                                </span>
 
-                                {% else %}
+                            {% endif %}
 
-                                    <span class="badge bg-danger">
-                                        {{ skill[3] }}
-                                    </span>
+                        </td>
 
-                                {% endif %}
+                        <td>{{ skill[4] }}</td>
 
-                            </td>
+                        <td class="text-center">
 
-                            <td>{{ skill[4] }}</td>
+                            <a href="{{ url_for('skills.edit_skill', id=skill[0]) }}"
+                               class="btn btn-primary btn-sm">
 
-                            <td class="text-center">
+                                <i class="bi bi-pencil-square"></i>
+                                Edit
 
-                                <a href="{{ url_for('skills.edit_skill', skill_id=skill[0]) }}"
-                                   class="btn btn-primary btn-sm">
+                            </a>
 
-                                    <i class="bi bi-pencil-square"></i>
+                            <a href="{{ url_for('skills.delete_skill', id=skill[0]) }}"
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('Delete this skill?')">
 
-                                    Edit
+                                <i class="bi bi-trash-fill"></i>
+                                Delete
 
-                                </a>
+                            </a>
 
-                                <a href="{{ url_for('skills.delete_skill', skill_id=skill[0]) }}"
-                                   class="btn btn-danger btn-sm"
-                                   onclick="return confirm('Delete this skill?')">
+                        </td>
 
-                                    <i class="bi bi-trash-fill"></i>
+                    </tr>
 
-                                    Delete
+                    {% endfor %}
 
-                                </a>
+                {% else %}
 
-                            </td>
+                    <tr>
 
-                        </tr>
+                        <td colspan="5" class="text-center text-muted py-4">
 
-                        {% endfor %}
+                            <i class="bi bi-info-circle"></i>
+                            No skills added yet.
 
-                    {% else %}
+                        </td>
 
-                        <tr>
+                    </tr>
 
-                            <td colspan="5"
-                                class="text-center text-muted py-4">
-
-                                <i class="bi bi-info-circle"></i>
-
-                                No skills added yet.
-
-                            </td>
-
-                        </tr>
-
-                    {% endif %}
+                {% endif %}
 
                 </tbody>
 
@@ -152,5 +157,49 @@ My Skills
     </div>
 
 </div>
+
+<!-- Search + Filter Script -->
+<script>
+
+const searchInput = document.getElementById("searchSkill");
+const levelFilter = document.getElementById("levelFilter");
+
+searchInput.addEventListener("keyup", filterSkills);
+levelFilter.addEventListener("change", filterSkills);
+
+function filterSkills() {
+
+    let searchValue = searchInput.value.toLowerCase();
+    let levelValue = levelFilter.value.toLowerCase();
+
+    let rows = document.querySelectorAll("tbody tr");
+
+    rows.forEach(function(row) {
+
+        if (row.cells.length < 5) return;
+
+        let skill = row.cells[1].innerText.toLowerCase();
+        let level = row.cells[2].innerText.toLowerCase();
+
+        let skillMatch = skill.includes(searchValue);
+
+        let levelMatch =
+            levelValue === "" || level.includes(levelValue);
+
+        if (skillMatch && levelMatch) {
+
+            row.style.display = "";
+
+        } else {
+
+            row.style.display = "none";
+
+        }
+
+    });
+
+}
+
+</script>
 
 {% endblock %}

@@ -51,6 +51,29 @@ class User:
         return user
 
     @staticmethod
+    def get_user_by_fullname(mysql, fullname):
+        """
+        Retrieve a user by full name.
+        """
+
+        cursor = mysql.connection.cursor()
+
+        cursor.execute(
+            """
+            SELECT *
+            FROM users
+            WHERE fullname = %s
+            """,
+            (fullname,)
+        )
+
+        user = cursor.fetchone()
+
+        cursor.close()
+
+        return user
+
+    @staticmethod
     def verify_password(user, password):
         """
         Verify the entered password against the stored hashed password.

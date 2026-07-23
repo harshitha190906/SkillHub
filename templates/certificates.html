@@ -31,7 +31,7 @@ Certificates
 
 </div>
 
-<div class="card shadow">
+<div class="card shadow border-0">
 
     <div class="card-body">
 
@@ -42,79 +42,77 @@ Certificates
                 <thead class="table-dark">
 
                     <tr>
-
                         <th>#</th>
                         <th>Title</th>
                         <th>Certificate</th>
                         <th class="text-center">Actions</th>
-
                     </tr>
 
                 </thead>
 
                 <tbody>
 
-                    {% if certificates %}
+                {% if certificates %}
 
-                        {% for certificate in certificates %}
+                    {% for certificate in certificates %}
 
-                        <tr>
+                    <tr>
 
-                            <td>{{ loop.index }}</td>
+                        <td>{{ loop.index }}</td>
 
-                            <td>
-                                {{ certificate[2] }}
-                            </td>
+                        <td>
+                            <strong>{{ certificate[2] }}</strong>
+                        </td>
 
-                            <td>
+                        <td>
 
-                                <a href="{{ url_for('static', filename='uploads/' ~ certificate[3]) }}"
-                                   target="_blank"
-                                   class="btn btn-info btn-sm">
+                            <a href="{{ url_for('static', filename='uploads/' ~ certificate[3]) }}"
+                               target="_blank"
+                               class="btn btn-info btn-sm">
 
-                                    👁 View
+                                👁 View
 
-                                </a>
+                            </a>
 
-                            </td>
+                        </td>
 
-                            <td class="text-center">
+                        <td class="text-center">
 
-                                <a href="{{ url_for('static', filename='uploads/' ~ certificate[3]) }}"
-                                   download
-                                   class="btn btn-primary btn-sm">
+                            <a href="{{ url_for('static', filename='uploads/' ~ certificate[3]) }}"
+                               download
+                               class="btn btn-primary btn-sm">
 
-                                    ⬇ Download
+                                ⬇ Download
 
-                                </a>
+                            </a>
 
-                                <a href="{{ url_for('certificate.delete_certificate', certificate_id=certificate[0]) }}"
-                                   class="btn btn-danger btn-sm"
-                                   onclick="return confirm('Delete this certificate?')">
+                            <a href="{{ url_for('certificate.delete_certificate', id=certificate[0]) }}"
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('Delete this certificate?')">
 
-                                    🗑 Delete
+                                🗑 Delete
 
-                                </a>
+                            </a>
 
-                            </td>
+                        </td>
 
-                        </tr>
+                    </tr>
 
-                        {% endfor %}
+                    {% endfor %}
 
-                    {% else %}
+                {% else %}
 
-                        <tr>
+                    <tr>
 
-                            <td colspan="4" class="text-center text-muted py-4">
+                        <td colspan="4" class="text-center text-muted py-4">
 
-                                No certificates uploaded yet.
+                            No certificates uploaded yet.
 
-                            </td>
+                        </td>
 
-                        </tr>
+                    </tr>
 
-                    {% endif %}
+                {% endif %}
 
                 </tbody>
 
