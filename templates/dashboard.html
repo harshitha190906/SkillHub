@@ -1,213 +1,67 @@
-{% extends "layout.html" %}
+@app.route("/dashboard")
+def dashboard():
 
-{% block title %}
-Dashboard
-{% endblock %}
+    if "user_id" not in session:
+        return redirect(url_for("auth.login"))
 
-{% block content %}
+    try:
+        cursor = mysql.connection.cursor()
 
-<h2 class="mb-4">📊 Dashboard</h2>
+        # Total Skills
+        cursor.execute(
+            "SELECT COUNT(*) FROM skills WHERE user_id=%s",
+            (session["user_id"],)
+        )
+        skill_count = cursor.fetchone()[0]
 
-<!-- Statistics Cards -->
-<div class="row g-4">
+        # Total Certificates
+        cursor.execute(
+            "SELECT COUNT(*) FROM certificates WHERE user_id=%s",
+            (session["user_id"],)
+        )
+        certificate_count = cursor.fetchone()[0]
 
-    <div class="col-lg-4 col-md-6">
-        <div class="card shadow border-0 text-center p-4">
-            <h5>💻 Total Skills</h5>
-            <h1 class="text-primary">{{ skill_count }}</h1>
-        </div>
-    </div>
+        # Latest Skill
+        cursor.execute(
+            """
+            SELECT skill_name
+            FROM skills
+            WHERE user_id=%s
+            ORDER BY id DESC
+            LIMIT 1
+            """,
+            (session["user_id"],)
+        )
 
-    <div class="col-lg-4 col-md-6">
-        <div class="card shadow border-0 text-center p-4">
-            <h5>📄 Certificates</h5>
-            <h1 class="text-success">{{ certificate_count }}</h1>
-        </div>
-    </div>
+        latest = cursor.fetchone()
+        latest_skill = latest[0] if latest else "No Skills"
 
-    <div class="col-lg-4 col-md-12">
-        <div class="card shadow border-0 text-center p-4">
-            <h5>⭐ Latest Skill</h5>
-            <h3>{{ latest_skill }}</h3>
-        </div>
-    </div>
+        # Chart Data
+        cursor.execute(
+            """
+            SELECT skill_level, COUNT(*)
+            FROM skills
+            WHERE user_id=%s
+            GROUP BY skill_level
+            """,
+            (session["user_id"],)
+        )
 
-</div>
+        chart = cursor.fetchall()
 
-<!-- Quick Actions -->
-<div class="row mt-4">
+        labels = [row[0] for row in chart]
+        values = [row[1] for row in chart]
 
-    <div class="col-md-3 mb-2">
-        <a href="{{ url_for('skills.add_skill') }}" class="btn btn-success w-100">
-            ➕ Add Skill
-        </a>
-    </div>
+        cursor.close()
 
-    <div class="col-md-3 mb-2">
-        <a href="{{ url_for('skills.view_skills') }}" class="btn btn-primary w-100">
-            💻 View Skills
-        </a>
-    </div>
+        return render_template(
+            "dashboard.html",
+            skill_count=skill_count,
+            certificate_count=certificate_count,
+            latest_skill=latest_skill,
+            labels=labels,
+            values=values
+        )
 
-    <div class="col-md-3 mb-2">
-        <a href="{{ url_for('certificate.certificates') }}" class="btn btn-warning w-100">
-            📄 Certificates
-        </a>
-    </div>
-
-    <div class="col-md-3 mb-2">
-        <a href="{{ url_for('profile') }}" class="btn btn-info w-100">
-            👤 Profile
-        </a>
-    </div>
-
-</div>
-
-<!-- Charts -->
-<div class="row mt-5">
-
-    <div class="col-lg-6">
-
-        <div class="card shadow">
-
-            <div class="card-body">
-
-                <h4 class="mb-3">📈 Skill Levels</h4>
-
-                {% if labels and values %}
-                <canvas id="skillChart"></canvas>
-                {% else %}
-                <p class="text-muted text-center">
-                    No skill data available.
-                </p>
-                {% endif %}
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="col-lg-6">
-
-        <div class="card shadow">
-
-            <div class="card-body">
-
-                <h4 class="mb-3">🥧 Skill Distribution</h4>
-
-                {% if labels and values %}
-                <canvas id="pieChart"></canvas>
-                {% else %}
-                <p class="text-muted text-center">
-                    No skill data available.
-                </p>
-                {% endif %}
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- Recent Activity -->
-<div class="card shadow mt-5">
-
-    <div class="card-body">
-
-        <h4 class="mb-3">📌 Recent Activity</h4>
-
-        <ul class="list-group">
-
-            <li class="list-group-item">
-                💻 Latest Skill Added:
-                <strong>{{ latest_skill }}</strong>
-            </li>
-
-            <li class="list-group-item">
-                📄 Certificates Uploaded:
-                <strong>{{ certificate_count }}</strong>
-            </li>
-
-            <li class="list-group-item">
-                📊 Total Skills:
-                <strong>{{ skill_count }}</strong>
-            </li>
-
-        </ul>
-
-    </div>
-
-</div>
-
-{% if labels and values %}
-
-<script>
-
-const labels = JSON.parse('{{ labels | tojson | safe }}');
-const values = JSON.parse('{{ values | tojson | safe }}');
-
-// Bar Chart
-new Chart(document.getElementById("skillChart"), {
-
-    type: "bar",
-
-    data: {
-        labels: labels,
-        datasets: [{
-            label: "Skills",
-            data: values,
-            backgroundColor: [
-                "#0d6efd",
-                "#198754",
-                "#ffc107"
-            ]
-        }]
-    },
-
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                display: false
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
-    }
-
-});
-
-// Pie Chart
-new Chart(document.getElementById("pieChart"), {
-
-    type: "pie",
-
-    data: {
-        labels: labels,
-        datasets: [{
-            data: values,
-            backgroundColor: [
-                "#0d6efd",
-                "#198754",
-                "#ffc107"
-            ]
-        }]
-    },
-
-    options: {
-        responsive: true
-    }
-
-});
-
-</script>
-
-{% endif %}
-
-{% endblock %}
+    except Exception as e:
+        return f"<h2>Error:</h2><pre>{e}</pre>"
