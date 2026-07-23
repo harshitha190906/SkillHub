@@ -43,71 +43,20 @@ app.register_blueprint(certificate)
 def home():
     return render_template("index.html")
 
-
 @app.route("/dashboard")
 def dashboard():
 
     if "user_id" not in session:
         return redirect(url_for("auth.login"))
 
-    cursor = mysql.connection.cursor()
-
-    # Total Skills
-    cursor.execute(
-        "SELECT COUNT(*) FROM skills WHERE user_id=%s",
-        (session["user_id"],)
-    )
-    skill_count = cursor.fetchone()[0]
-
-    # Total Certificates
-    cursor.execute(
-        "SELECT COUNT(*) FROM certificates WHERE user_id=%s",
-        (session["user_id"],)
-    )
-    certificate_count = cursor.fetchone()[0]
-
-    # Latest Skill
-    cursor.execute(
-        """
-        SELECT skill_name
-        FROM skills
-        WHERE user_id=%s
-        ORDER BY id DESC
-        LIMIT 1
-        """,
-        (session["user_id"],)
-    )
-
-    latest = cursor.fetchone()
-    latest_skill = latest[0] if latest else "No Skills"
-
-    # Chart Data
-    cursor.execute(
-        """
-        SELECT skill_level, COUNT(*)
-        FROM skills
-        WHERE user_id=%s
-        GROUP BY skill_level
-        """,
-        (session["user_id"],)
-    )
-
-    chart = cursor.fetchall()
-
-    labels = [row[0] for row in chart]
-    values = [row[1] for row in chart]
-
-    cursor.close()
-
     return render_template(
         "dashboard.html",
-        skill_count=skill_count,
-        certificate_count=certificate_count,
-        latest_skill=latest_skill,
-        labels=labels,
-        values=values
+        skill_count=0,
+        certificate_count=0,
+        latest_skill="No Skills",
+        labels=[],
+        values=[]
     )
-
 
 @app.route("/profile")
 def profile():
