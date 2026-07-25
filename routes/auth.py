@@ -20,7 +20,7 @@ def register():
     if request.method == "POST":
 
         fullname = request.form["fullname"].strip()
-        email = request.form["email"].strip()
+        email = request.form["email"].strip().lower()
         password = request.form["password"]
         confirm = request.form["confirm_password"]
 
@@ -28,14 +28,14 @@ def register():
             flash("Passwords do not match!", "danger")
             return redirect(url_for("auth.register"))
 
-        # Check if username already exists
+        # Check username
         existing_user = User.get_user_by_fullname(mysql, fullname)
 
         if existing_user:
             flash("Username already exists!", "warning")
             return redirect(url_for("auth.register"))
 
-        # Check if email already exists
+        # Check email
         existing_email = User.get_user_by_email(mysql, email)
 
         if existing_email:
@@ -44,7 +44,7 @@ def register():
 
         User.create_user(mysql, fullname, email, password)
 
-        flash("Registration Successful. Please Login.", "success")
+        flash("Registration successful. Please login.", "success")
 
         return redirect(url_for("auth.login"))
 
@@ -63,20 +63,19 @@ def login():
 
         user = User.get_user_by_fullname(mysql, fullname)
 
-        if user:
+        if user and check_password_hash(user[3], password):
 
-            if check_password_hash(user[3], password):
+            session.clear()
 
-                session["user_id"] = user[0]
-                session["fullname"] = user[1]
-                session["email"] = user[2]
+            session["user_id"] = user[0]
+            session["fullname"] = user[1]
+            session["email"] = user[2]
 
-                flash(f"Welcome {user[1]}!", "success")
+            flash(f"Welcome, {user[1]}!", "success")
 
-                return redirect(url_for("dashboard"))
+            return redirect(url_for("dashboard"))
 
-        flash("Invalid Username or Password!", "danger")
-
+        flash("Invalid username or password!", "danger")
         return redirect(url_for("auth.login"))
 
     return render_template("login.html")

@@ -6,9 +6,7 @@ class User:
 
     @staticmethod
     def create_user(mysql, fullname, email, password):
-        """
-        Create a new user account.
-        """
+        """Create a new user account."""
 
         cursor = mysql.connection.cursor()
 
@@ -19,7 +17,7 @@ class User:
             INSERT INTO users (fullname, email, password)
             VALUES (%s, %s, %s)
             """,
-            (fullname, email, hashed_password)
+            (fullname, email.lower(), hashed_password)
         )
 
         mysql.connection.commit()
@@ -29,9 +27,7 @@ class User:
 
     @staticmethod
     def get_user_by_email(mysql, email):
-        """
-        Retrieve a user by email address.
-        """
+        """Retrieve a user by email."""
 
         cursor = mysql.connection.cursor()
 
@@ -39,9 +35,9 @@ class User:
             """
             SELECT *
             FROM users
-            WHERE email = %s
+            WHERE email=%s
             """,
-            (email,)
+            (email.lower(),)
         )
 
         user = cursor.fetchone()
@@ -52,9 +48,7 @@ class User:
 
     @staticmethod
     def get_user_by_fullname(mysql, fullname):
-        """
-        Retrieve a user by full name.
-        """
+        """Retrieve a user by fullname."""
 
         cursor = mysql.connection.cursor()
 
@@ -62,7 +56,7 @@ class User:
             """
             SELECT *
             FROM users
-            WHERE fullname = %s
+            WHERE fullname=%s
             """,
             (fullname,)
         )
@@ -75,11 +69,9 @@ class User:
 
     @staticmethod
     def verify_password(user, password):
-        """
-        Verify the entered password against the stored hashed password.
-        """
+        """Verify password."""
 
-        if user is None:
+        if not user:
             return False
 
         return check_password_hash(user[3], password)

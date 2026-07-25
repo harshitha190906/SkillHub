@@ -1,5 +1,4 @@
-from fileinput import filename
-
+# pyrefly: ignore [missing-import]
 from flask import (
     Flask,
     render_template,
@@ -9,9 +8,12 @@ from flask import (
     request,
     flash
 )
+# pyrefly: ignore [missing-import]
 from flask_mysqldb import MySQL
 import os
+# pyrefly: ignore [missing-import]
 from werkzeug.utils import secure_filename
+# pyrefly: ignore [missing-import]
 from werkzeug.security import generate_password_hash, check_password_hash
 from config import Config
 
@@ -21,9 +23,11 @@ from routes.certificate import certificate, init_mysql as init_certificate_mysql
 
 app = Flask(__name__)
 
+# Load configurations from Config object
 app.config.from_object(Config)
-app.config["UPLOAD_FOLDER"] = Config.UPLOAD_FOLDER
-app.secret_key = Config.SECRET_KEY
+app.secret_key = app.config.get("SECRET_KEY", "default_secret_key")
+
+
 
 # Initialize MySQL
 mysql = MySQL(app)
@@ -49,14 +53,64 @@ def dashboard():
     if "user_id" not in session:
         return redirect(url_for("auth.login"))
 
-    return render_template(
-        "dashboard.html",
-        skill_count=0,
-        certificate_count=0,
-        latest_skill="No Skills",
-        labels=[],
-        values=[]
-    )
+    try:
+        cursor = mysql.connection.cursor()
+
+        # Total Skills
+        cursor.execute(
+            "SELECT COUNT(*) FROM skills WHERE user_id=%s",
+            (session["user_id"],)
+        )
+        skill_count = cursor.fetchone()[0]
+
+        # Total Certificates
+        cursor.execute(
+            "SELECT COUNT(*) FROM certificates WHERE user_id=%s",
+            (session["user_id"],)
+        )
+        certificate_count = cursor.fetchone()[0]
+
+        # Latest Skill
+        cursor.execute("""
+            SELECT skill_name
+            FROM skills
+            WHERE user_id=%s
+            ORDER BY id DESC
+            LIMIT 1
+        """, (session["user_id"],))
+
+        latest = cursor.fetchone()
+        latest_skill = latest[0] if latest else "No Skills"
+
+        # Chart Data
+        cursor.execute("""
+            SELECT skill_level, COUNT(*)
+            FROM skills
+            WHERE user_id=%s
+            GROUP BY skill_level
+        """, (session["user_id"],))
+
+        chart = cursor.fetchall()
+
+        labels = [row[0] for row in chart]
+        values = [row[1] for row in chart]
+
+        cursor.close()
+
+        return render_template(
+            "dashboard.html",
+            skill_count=skill_count,
+            certificate_count=certificate_count,
+            latest_skill=latest_skill,
+            labels=labels,
+            values=values
+        )
+
+    except Exception as e:
+        return f"""
+        <h2>Dashboard Error</h2>
+        <pre>{e}</pre>
+        """
 
 @app.route("/profile")
 def profile():
@@ -158,10 +212,51 @@ def profile_edit():
         return redirect(url_for("auth.login"))
 
     if request.method == "POST":
+        fullname = request.form["fullname"].strip()
+        bio = request.form["bio"].strip()
+
+        file = request.files.get("profile")
+
+        cursor = mysql.connection.cursor()
+
+        if file and file.filename != "":
+            filename = secure_filename(file.filename)
+            upload_folder = os.path.join(app.root_path, "static", "uploads", "profiles")
+            os.makedirs(upload_folder, exist_ok=True)
+            filepath = os.path.join(upload_folder, filename)
+            file.save(filepath)
+            image_path = f"uploads/profiles/{filename}"
+
+            cursor.execute("""
+                UPDATE users
+                SET fullname=%s, bio=%s, profile_image=%s
+                WHERE id=%s
+            """, (fullname, bio, image_path, session["user_id"]))
+        else:
+            cursor.execute("""
+                UPDATE users
+                SET fullname=%s, bio=%s
+                WHERE id=%s
+            """, (fullname, bio, session["user_id"]))
+
+        mysql.connection.commit()
+        cursor.close()
+
+        session["fullname"] = fullname
+
         flash("Profile updated successfully!", "success")
         return redirect(url_for("profile"))
 
-    return render_template("edit_profile.html")
+    cursor = mysql.connection.cursor()
+    cursor.execute("""
+        SELECT id, fullname, email, password, bio, profile_image
+        FROM users
+        WHERE id=%s
+    """, (session["user_id"],))
+    user = cursor.fetchone()
+    cursor.close()
+
+    return render_template("edit_profile.html", user=user)
 
 
 @app.route("/settings")

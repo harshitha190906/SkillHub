@@ -5,7 +5,8 @@ from flask import (
     redirect,
     url_for,
     session,
-    current_app
+    current_app,
+    flash
 )
 from werkzeug.utils import secure_filename
 from models.certificate import Certificate
@@ -65,32 +66,44 @@ def upload_certificate():
 
     if request.method == "POST":
 
-        title = request.form["title"]
+        title = request.form["title"].strip()
         file = request.files.get("certificate")
 
-        if file and allowed_file(file.filename):
+        if not file or file.filename == "":
+            flash("Please select a file.", "danger")
+            return redirect(url_for("certificate.upload_certificate"))
 
-            filename = secure_filename(file.filename)
+        if not allowed_file(file.filename):
+            flash("Only PDF, PNG, JPG and JPEG files are allowed.", "danger")
+            return redirect(url_for("certificate.upload_certificate"))
 
-            unique_name = f"{uuid.uuid4()}_{filename}"
+        filename = secure_filename(file.filename)
 
-            upload_path = os.path.join(
-                current_app.config["UPLOAD_FOLDER"],
-                unique_name
-            )
+        unique_name = f"{uuid.uuid4()}_{filename}"
 
-            file.save(upload_path)
+        upload_folder = current_app.config["UPLOAD_FOLDER"]
 
-            Certificate.add_certificate(
-                mysql,
-                session["user_id"],
-                title,
-                unique_name
-            )
+        os.makedirs(upload_folder, exist_ok=True)
 
-            return redirect(
-                url_for("certificate.certificates")
-            )
+        upload_path = os.path.join(
+            upload_folder,
+            unique_name
+        )
+
+        file.save(upload_path)
+
+        Certificate.add_certificate(
+            mysql,
+            session["user_id"],
+            title,
+            unique_name
+        )
+
+        flash("Certificate uploaded successfully!", "success")
+
+        return redirect(
+            url_for("certificate.certificates")
+        )
 
     return render_template("upload_certificate.html")
 
@@ -110,6 +123,8 @@ def delete_certificate(id):
         id,
         session["user_id"]
     )
+
+    flash("Certificate deleted successfully!", "success")
 
     return redirect(
         url_for("certificate.certificates")

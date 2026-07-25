@@ -1,9 +1,10 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from models.skill import Skill
 
 skills = Blueprint("skills", __name__)
 
 mysql = None
+
 
 def init_mysql(db):
     global mysql
@@ -29,9 +30,9 @@ def add_skill():
 
     if request.method == "POST":
 
-        skill_name = request.form["skill_name"]
+        skill_name = request.form["skill_name"].strip()
         skill_level = request.form["skill_level"]
-        description = request.form["description"]
+        description = request.form["description"].strip()
 
         Skill.add_skill(
             mysql,
@@ -41,6 +42,7 @@ def add_skill():
             description
         )
 
+        flash("Skill added successfully!", "success")
         return redirect(url_for("skills.view_skills"))
 
     return render_template("add_skill.html")
@@ -52,23 +54,33 @@ def edit_skill(id):
     if "user_id" not in session:
         return redirect(url_for("auth.login"))
 
+    skill = Skill.get_skill_by_id(
+        mysql,
+        id,
+        session["user_id"]
+    )
+
+    if not skill:
+        flash("Skill not found.", "danger")
+        return redirect(url_for("skills.view_skills"))
+
     if request.method == "POST":
 
-        skill_name = request.form["skill_name"]
+        skill_name = request.form["skill_name"].strip()
         skill_level = request.form["skill_level"]
-        description = request.form["description"]
+        description = request.form["description"].strip()
 
         Skill.update_skill(
             mysql,
             id,
+            session["user_id"],
             skill_name,
             skill_level,
             description
         )
 
+        flash("Skill updated successfully!", "success")
         return redirect(url_for("skills.view_skills"))
-
-    skill = Skill.get_skill_by_id(mysql, id)
 
     return render_template("edit_skill.html", skill=skill)
 
@@ -79,6 +91,11 @@ def delete_skill(id):
     if "user_id" not in session:
         return redirect(url_for("auth.login"))
 
-    Skill.delete_skill(mysql, id)
+    Skill.delete_skill(
+        mysql,
+        id,
+        session["user_id"]
+    )
 
+    flash("Skill deleted successfully!", "success")
     return redirect(url_for("skills.view_skills"))

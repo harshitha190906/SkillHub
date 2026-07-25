@@ -2,26 +2,32 @@
 // Dark Mode
 // =========================
 
+function updateThemeButton() {
+    const themeBtn = document.getElementById("themeButton");
+    if (!themeBtn) return;
+    if (document.body.classList.contains("dark-mode")) {
+        themeBtn.innerHTML = "☀️ Light Mode";
+    } else {
+        themeBtn.innerHTML = "🌙 Dark Mode";
+    }
+}
+
 function toggleTheme() {
-
     document.body.classList.toggle("dark-mode");
-
     if (document.body.classList.contains("dark-mode")) {
         localStorage.setItem("theme", "dark");
     } else {
         localStorage.setItem("theme", "light");
     }
-
+    updateThemeButton();
 }
 
 // Load saved theme
-
-window.addEventListener("load", () => {
-
+window.addEventListener("DOMContentLoaded", () => {
     if (localStorage.getItem("theme") === "dark") {
         document.body.classList.add("dark-mode");
     }
-
+    updateThemeButton();
 });
 
 // =========================

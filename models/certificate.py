@@ -3,9 +3,7 @@ class Certificate:
 
     @staticmethod
     def add_certificate(mysql, user_id, title, file_name):
-        """
-        Add a new certificate for a user.
-        """
+        """Add a new certificate."""
 
         cursor = mysql.connection.cursor()
 
@@ -14,7 +12,11 @@ class Certificate:
             INSERT INTO certificates (user_id, title, file_name)
             VALUES (%s, %s, %s)
             """,
-            (user_id, title, file_name)
+            (
+                user_id,
+                title.strip(),
+                file_name
+            )
         )
 
         mysql.connection.commit()
@@ -24,9 +26,7 @@ class Certificate:
 
     @staticmethod
     def get_certificates(mysql, user_id):
-        """
-        Retrieve all certificates of a user.
-        """
+        """Return all certificates of the logged-in user."""
 
         cursor = mysql.connection.cursor()
 
@@ -34,7 +34,7 @@ class Certificate:
             """
             SELECT *
             FROM certificates
-            WHERE user_id = %s
+            WHERE user_id=%s
             ORDER BY id DESC
             """,
             (user_id,)
@@ -48,18 +48,20 @@ class Certificate:
 
     @staticmethod
     def delete_certificate(mysql, certificate_id, user_id):
-        """
-        Delete a certificate only if it belongs to the logged-in user.
-        """
+        """Delete a certificate belonging to the logged-in user."""
 
         cursor = mysql.connection.cursor()
 
         cursor.execute(
             """
             DELETE FROM certificates
-            WHERE id = %s AND user_id = %s
+            WHERE id=%s
+            AND user_id=%s
             """,
-            (certificate_id, user_id)
+            (
+                certificate_id,
+                user_id
+            )
         )
 
         mysql.connection.commit()

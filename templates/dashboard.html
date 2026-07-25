@@ -1,67 +1,155 @@
-@app.route("/dashboard")
-def dashboard():
+{% extends "layout.html" %}
 
-    if "user_id" not in session:
-        return redirect(url_for("auth.login"))
+{% block title %}
+Dashboard
+{% endblock %}
 
-    try:
-        cursor = mysql.connection.cursor()
+{% block content %}
+<div class="row">
+    <!-- Stat Cards -->
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm bg-primary text-white h-100">
+            <div class="card-body d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="text-uppercase mb-1 opacity-75">Total Skills</h6>
+                    <h2 class="display-5 fw-bold mb-0">{{ skill_count }}</h2>
+                </div>
+                <div class="fs-1 opacity-50">
+                    <i class="bi bi-code-slash"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm bg-success text-white h-100">
+            <div class="card-body d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="text-uppercase mb-1 opacity-75">Certificates</h6>
+                    <h2 class="display-5 fw-bold mb-0">{{ certificate_count }}</h2>
+                </div>
+                <div class="fs-1 opacity-50">
+                    <i class="bi bi-award"></i>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        # Total Skills
-        cursor.execute(
-            "SELECT COUNT(*) FROM skills WHERE user_id=%s",
-            (session["user_id"],)
-        )
-        skill_count = cursor.fetchone()[0]
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm bg-warning text-dark h-100">
+            <div class="card-body d-flex align-items-center justify-content-between">
+                <div>
+                    <h6 class="text-uppercase mb-1 opacity-75">Latest Skill</h6>
+                    <h3 class="fw-bold mb-0 text-truncate" style="max-width: 200px;">{{ latest_skill }}</h3>
+                </div>
+                <div class="fs-1 opacity-50">
+                    <i class="bi bi-rocket-takeoff"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-        # Total Certificates
-        cursor.execute(
-            "SELECT COUNT(*) FROM certificates WHERE user_id=%s",
-            (session["user_id"],)
-        )
-        certificate_count = cursor.fetchone()[0]
+<div class="row">
+    <!-- Analytics Chart -->
+    <div class="col-md-8 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 pt-4">
+                <h5 class="card-title fw-bold">Skill Level Analytics</h5>
+            </div>
+            <div class="card-body">
+                <div style="position: relative; height: 300px;">
+                    <canvas id="skillsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        # Latest Skill
-        cursor.execute(
-            """
-            SELECT skill_name
-            FROM skills
-            WHERE user_id=%s
-            ORDER BY id DESC
-            LIMIT 1
-            """,
-            (session["user_id"],)
-        )
+    <!-- Quick Actions -->
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 pt-4">
+                <h5 class="card-title fw-bold">Quick Actions</h5>
+            </div>
+            <div class="card-body d-grid gap-3">
+                <a href="{{ url_for('skills.add_skill') }}" class="btn btn-primary d-flex align-items-center justify-content-center py-3">
+                    <i class="bi bi-plus-circle me-2 fs-5"></i> Add a New Skill
+                </a>
+                <a href="{{ url_for('certificate.upload_certificate') }}" class="btn btn-success d-flex align-items-center justify-content-center py-3">
+                    <i class="bi bi-upload me-2 fs-5"></i> Upload Certificate
+                </a>
+                <a href="{{ url_for('profile') }}" class="btn btn-info text-white d-flex align-items-center justify-content-center py-3">
+                    <i class="bi bi-person me-2 fs-5"></i> View Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 
-        latest = cursor.fetchone()
-        latest_skill = latest[0] if latest else "No Skills"
+<!-- Chart.js Logic -->
+<script id="skills-labels-data" type="application/json">
+    {{ labels | tojson | safe }}
+</script>
+<script id="skills-values-data" type="application/json">
+    {{ values | tojson | safe }}
+</script>
 
-        # Chart Data
-        cursor.execute(
-            """
-            SELECT skill_level, COUNT(*)
-            FROM skills
-            WHERE user_id=%s
-            GROUP BY skill_level
-            """,
-            (session["user_id"],)
-        )
-
-        chart = cursor.fetchall()
-
-        labels = [row[0] for row in chart]
-        values = [row[1] for row in chart]
-
-        cursor.close()
-
-        return render_template(
-            "dashboard.html",
-            skill_count=skill_count,
-            certificate_count=certificate_count,
-            latest_skill=latest_skill,
-            labels=labels,
-            values=values
-        )
-
-    except Exception as e:
-        return f"<h2>Error:</h2><pre>{e}</pre>"
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const ctx = document.getElementById('skillsChart').getContext('2d');
+    
+    // Dynamic chart data from backend
+    const labels = JSON.parse(document.getElementById('skills-labels-data').textContent);
+    const values = JSON.parse(document.getElementById('skills-values-data').textContent);
+    
+    if (labels.length === 0) {
+        ctx.font = "16px sans-serif";
+        ctx.fillStyle = "#888";
+        ctx.textAlign = "center";
+        ctx.fillText("No skill data available to display.", ctx.canvas.width/2, ctx.canvas.height/2);
+        return;
+    }
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Number of Skills',
+                data: values,
+                backgroundColor: [
+                    'rgba(25, 135, 84, 0.7)',  // Beginner (Green)
+                    'rgba(255, 193, 7, 0.7)',  // Intermediate (Yellow)
+                    'rgba(220, 53, 69, 0.7)'   // Advanced (Red)
+                ],
+                borderColor: [
+                    'rgba(25, 135, 84, 1)',
+                    'rgba(255, 193, 7, 1)',
+                    'rgba(220, 53, 69, 1)'
+                ],
+                borderWidth: 1,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
