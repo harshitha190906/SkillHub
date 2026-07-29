@@ -1,0 +1,453 @@
+/* Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* ===================================
+   GLOBAL
+=================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    background:#f4f6f9;
+    color:#333;
+    transition:all .3s ease;
+}
+
+/* ===================================
+   SIDEBAR
+=================================== */
+
+.sidebar{
+    width:240px;
+    min-height:100vh;
+    background:#212529;
+    position:sticky;
+    top:0;
+    padding:20px;
+}
+
+.sidebar h2{
+    color:white;
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.sidebar a{
+    display:block;
+    color:white;
+    text-decoration:none;
+    padding:12px 15px;
+    margin-bottom:10px;
+    border-radius:10px;
+    font-weight:500;
+    transition:.3s;
+}
+
+.sidebar a i{
+    margin-right:10px;
+}
+
+.sidebar a:hover{
+    background:#0d6efd;
+    transform:translateX(5px);
+}
+
+/* ===================================
+   CONTENT
+=================================== */
+
+.content{
+    width:100%;
+    min-height:100vh;
+}
+
+/* ===================================
+   NAVBAR
+=================================== */
+
+.navbar{
+    background:white !important;
+    padding:15px;
+    transition:.3s;
+}
+
+.navbar-brand{
+    font-weight:600;
+    color:#000;
+}
+
+/* Welcome Text */
+
+.welcome-text{
+    color:#000;
+    font-weight:600;
+    transition:.3s;
+}
+
+/* ===================================
+   CARDS
+=================================== */
+
+.card{
+    border:none;
+    border-radius:15px;
+    transition:.3s;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+
+.card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 15px 25px rgba(0,0,0,.18);
+}
+
+/* ===================================
+   BUTTONS
+=================================== */
+
+.btn{
+    border-radius:8px;
+    transition:.3s;
+}
+
+.btn:hover{
+    transform:translateY(-2px);
+}
+
+/* ===================================
+   TABLES
+=================================== */
+
+.table{
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.table th{
+    background:#2563eb;
+    color:white;
+    text-align:center;
+}
+
+.table td{
+    vertical-align:middle;
+}
+
+/* ===================================
+   FORMS
+=================================== */
+
+.form-control,
+.form-select{
+    border-radius:8px;
+}
+
+.form-control:focus,
+.form-select:focus{
+    border-color:#2563eb;
+    box-shadow:0 0 8px rgba(37,99,235,.2);
+}
+
+/* ===================================
+   PROFILE
+=================================== */
+
+.profile-img{
+    width:150px;
+    height:150px;
+    object-fit:cover;
+    border-radius:50%;
+    border:4px solid #2563eb;
+}
+
+/* ===================================
+   DASHBOARD
+=================================== */
+
+.stat-card{
+    text-align:center;
+    padding:20px;
+}
+
+.stat-card h1{
+    font-size:45px;
+    font-weight:bold;
+}
+
+/* ===================================
+   FOOTER
+=================================== */
+
+footer{
+    margin-top:50px;
+    padding:20px;
+    text-align:center;
+    background:white;
+    color:#777;
+}
+
+/* ===================================
+   DARK MODE
+=================================== */
+
+.dark-mode{
+    background:#111827;
+    color:white;
+}
+
+/* Navbar */
+
+.dark-mode .navbar{
+    background:#1f2937 !important;
+}
+
+.dark-mode .navbar-brand,
+.dark-mode .welcome-text{
+    color:white !important;
+}
+
+/* Theme Button */
+
+.dark-mode .btn-outline-dark{
+    color:white;
+    border-color:white;
+}
+
+.dark-mode .btn-outline-dark:hover{
+    background:white;
+    color:#111827;
+}
+
+/* Sidebar */
+
+.dark-mode .sidebar{
+    background:#0f172a;
+}
+
+/* Cards */
+
+.dark-mode .card{
+    background:#374151;
+    color:white;
+}
+
+/* Tables */
+
+.dark-mode .table{
+    color:white;
+}
+
+.dark-mode table,
+.dark-mode table td,
+.dark-mode table th{
+    color:white !important;
+}
+
+.dark-mode tbody tr{
+    background:#374151;
+}
+
+.dark-mode tbody tr:hover{
+    background:#4b5563;
+}
+
+.dark-mode .table td{
+    background:#415574;
+}
+
+.dark-mode .table th{
+    background:#2563eb;
+}
+
+/* Skill & Certificate Titles */
+
+.dark-mode td strong{
+    color:white !important;
+}
+
+.dark-mode td{
+    color:white;
+}
+
+/* Forms */
+
+.dark-mode .form-control,
+.dark-mode .form-select{
+    background:#1f2937;
+    color:white;
+    border:1px solid #e1e8f2;
+}
+
+.dark-mode .form-control::placeholder{
+    color:#cbd5e1;
+}
+
+.dark-mode .form-control:focus,
+.dark-mode .form-select:focus{
+    background:#1f2937;
+    color:white;
+    border-color:#3b82f6;
+    box-shadow:0 0 10px rgba(59,130,246,.25);
+}
+
+/* Search Box */
+
+.dark-mode input,
+.dark-mode select{
+    color:white;
+}
+
+/* Footer */
+
+.dark-mode footer{
+    background:#1f2937;
+    color:white;
+}
+
+/* Badges */
+
+.badge{
+    font-size:13px;
+}
+
+/* Links */
+
+.dark-mode a{
+    color:#93c5fd;
+}
+
+.dark-mode a:hover{
+    color:white;
+}
+
+/* ===================================
+   SCROLLBAR
+=================================== */
+
+::-webkit-scrollbar{
+    width:8px;
+}
+
+::-webkit-scrollbar-thumb{
+    background:#6b7280;
+    border-radius:10px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+    background:#4b5563;
+}
+
+/* ===================================
+   RESPONSIVE
+=================================== */
+
+@media(max-width:768px){
+
+    .sidebar{
+        width:80px;
+        padding:15px;
+    }
+
+    .sidebar h2{
+        font-size:18px;
+    }
+
+    .sidebar a{
+        font-size:0;
+        text-align:center;
+        padding:15px;
+    }
+
+    .sidebar a i{
+        margin-right:0;
+        font-size:20px;
+    }
+
+    .navbar-brand{
+        font-size:18px;
+    }
+
+    .welcome-text{
+        font-size:18px;
+    }
+
+    .card{
+        margin-bottom:20px;
+    }
+}
+/* View Button Text */
+.btn-info,
+.btn-info:link,
+.btn-info:visited{
+    color:#ffffff !important;
+    font-weight:500;
+}
+
+.btn-info:hover{
+    color:#ffffff !important;
+}
+
+.dark-mode .btn-info,
+.dark-mode .btn-info:link,
+.dark-mode .btn-info:visited{
+    color:#ffffff !important;
+}
+
+.dark-mode .btn-info:hover{
+    color:#ffffff !important;
+}
+/* ==========================
+   PROFILE PAGE - DARK MODE
+========================== */
+
+/* User subtitle */
+.dark-mode .text-muted{
+    color:#cbd5e1 !important;
+}
+
+/* Labels */
+.dark-mode h6{
+    color:#d1d5db !important;
+}
+
+/* Profile details */
+.dark-mode p,
+.dark-mode .fw-bold{
+    color:#ffffff !important;
+}
+
+/* Horizontal line */
+.dark-mode hr{
+    border-color:#6b7280;
+}
+
+/* Dashboard Button */
+.dark-mode .btn-secondary{
+    background:#6c757d !important;
+    border-color:#6c757d !important;
+    color:#ffffff !important;
+}
+
+.dark-mode .btn-secondary:hover{
+    background:#5a6268 !important;
+    border-color:#5a6268 !important;
+    color:#ffffff !important;
+}
+
+/* Primary Button */
+.dark-mode .btn-primary{
+    color:#ffffff !important;
+}
+
+/* Badge */
+.dark-mode .badge{
+    color:#ffffff !important;
+}

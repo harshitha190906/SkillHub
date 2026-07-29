@@ -1,0 +1,143 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Edit Profile
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body p-4">
+
+                    <h2 class="text-center mb-4">
+                        ✏️ Edit Profile
+                    </h2>
+
+                    <form method="POST" enctype="multipart/form-data">
+
+                        <!-- Full Name -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Full Name
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                name="fullname"
+                                value="{{ user[1] }}"
+                                placeholder="Enter your full name"
+                                required>
+
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Email
+                            </label>
+
+                            <input
+                                type="email"
+                                class="form-control"
+                                value="{{ user[2] }}"
+                                readonly>
+
+                            <small class="text-muted">
+                                Email cannot be changed.
+                            </small>
+
+                        </div>
+
+                        <!-- Bio -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Bio
+                            </label>
+
+                            <textarea
+                                class="form-control"
+                                name="bio"
+                                rows="4"
+                                placeholder="Tell us something about yourself...">{{ user[4] if user[4] else "" }}</textarea>
+
+                        </div>
+
+                        <!-- Current Profile Image -->
+                        {% if user[5] %}
+
+                        <div class="mb-3 text-center">
+
+                            <label class="form-label d-block">
+                                Current Profile Picture
+                            </label>
+
+                            <img
+                                src="{{ url_for('static', filename=user[5]) }}"
+                                class="rounded-circle shadow"
+                                width="150"
+                                height="150"
+                                style="object-fit:cover;">
+
+                        </div>
+
+                        {% endif %}
+
+                        <!-- Upload New Image -->
+                        <div class="mb-4">
+
+                            <label class="form-label">
+                                Change Profile Picture
+                            </label>
+
+                            <input
+                                type="file"
+                                class="form-control"
+                                name="profile"
+                                accept="image/*">
+
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-between">
+
+                            <a href="{{ url_for('profile') }}"
+                               class="btn btn-secondary">
+
+                                ← Cancel
+
+                            </a>
+
+                            <button
+                                type="submit"
+                                class="btn btn-success">
+
+                                💾 Save Changes
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

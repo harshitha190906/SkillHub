@@ -1,0 +1,120 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Edit Skill
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body p-4">
+
+                    <h2 class="text-center mb-4">
+                        ✏️ Edit Skill
+                    </h2>
+
+                    <form method="POST">
+
+                        <!-- Skill Name -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Skill Name
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                name="skill_name"
+                                value="{{ skill[2] }}"
+                                placeholder="Enter Skill Name"
+                                required>
+
+                        </div>
+
+                        <!-- Skill Level -->
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Skill Level
+                            </label>
+
+                            <select
+                                class="form-select"
+                                name="skill_level"
+                                required>
+
+                                <option value="Beginner"
+                                    {% if skill[3] == "Beginner" %}selected{% endif %}>
+                                    Beginner
+                                </option>
+
+                                <option value="Intermediate"
+                                    {% if skill[3] == "Intermediate" %}selected{% endif %}>
+                                    Intermediate
+                                </option>
+
+                                <option value="Advanced"
+                                    {% if skill[3] == "Advanced" %}selected{% endif %}>
+                                    Advanced
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-4">
+
+                            <label class="form-label">
+                                Description
+                            </label>
+
+                            <textarea
+                                class="form-control"
+                                name="description"
+                                rows="5"
+                                placeholder="Describe your skill...">{{ skill[4] }}</textarea>
+
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-between">
+
+                            <a href="{{ url_for('skills.view_skills') }}"
+                               class="btn btn-secondary">
+
+                                ← Cancel
+
+                            </a>
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary">
+
+                                💾 Update Skill
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
