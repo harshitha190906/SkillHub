@@ -1,2 +1,5 @@
 [pkgs]
 apt = ["mariadb-client", "libmariadb-dev", "gcc", "pkg-config"]
+
+[start]
+cmd = "gunicorn app:app"
