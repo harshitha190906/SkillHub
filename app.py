@@ -44,6 +44,50 @@ app.register_blueprint(skills)
 app.register_blueprint(certificate)
 
 
+def init_tables():
+    """Auto-create DB tables if they don't exist (runs on startup)."""
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                fullname VARCHAR(255) NOT NULL,
+                email VARCHAR(255) NOT NULL UNIQUE,
+                password VARCHAR(255) NOT NULL,
+                bio TEXT,
+                profile_image VARCHAR(255)
+            )
+        """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS skills (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                skill_name VARCHAR(255) NOT NULL,
+                skill_level VARCHAR(50) NOT NULL,
+                description TEXT,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+        """)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS certificates (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                title VARCHAR(255) NOT NULL,
+                file_name VARCHAR(255) NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+        """)
+        mysql.connection.commit()
+        cursor.close()
+        print("✅ Database tables verified/created successfully.")
+    except Exception as e:
+        print(f"⚠️  Table init warning: {e}")
+
+
+with app.app_context():
+    init_tables()
+
+
 @app.route("/")
 def home():
     return render_template("index.html")

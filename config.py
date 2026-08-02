@@ -5,13 +5,17 @@ from dotenv import load_dotenv
 # Project root directory
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-# Load environment variables
-load_dotenv(os.path.join(BASE_DIR, ".env"), override=True)
+# Only load .env in local development.
+# On Railway, environment variables are already injected at the OS level.
+# Using override=True would replace Railway's correct internal DB host
+# (mysql.railway.internal) with the public proxy from .env, causing failures.
+if not os.getenv("RAILWAY_ENVIRONMENT"):
+    load_dotenv(os.path.join(BASE_DIR, ".env"))
+
 print("===================================")
 print("DB_HOST:", os.getenv("DB_HOST"))
 print("DB_PORT:", os.getenv("DB_PORT"))
 print("DB_USER:", os.getenv("DB_USER"))
-print("DB_PASSWORD:", os.getenv("DB_PASSWORD"))
 print("DB_NAME:", os.getenv("DB_NAME"))
 print("===================================")
 
