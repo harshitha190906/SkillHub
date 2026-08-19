@@ -17,6 +17,7 @@ from werkzeug.utils import secure_filename
 # pyrefly: ignore [missing-import]
 from werkzeug.security import generate_password_hash, check_password_hash
 from config import Config
+from utils.db_adapter import SmartMySQL
 
 from routes.auth import auth, init_mysql
 from routes.skills import skills, init_mysql as init_skill_mysql
@@ -30,8 +31,8 @@ app.secret_key = app.config.get("SECRET_KEY", "default_secret_key")
 
 
 
-# Initialize MySQL
-mysql = MySQL(app)
+# Initialize MySQL with smart fallback
+mysql = SmartMySQL(app)
 
 # Initialize Blueprints
 init_mysql(mysql)
@@ -79,9 +80,9 @@ def init_tables():
         """)
         mysql.connection.commit()
         cursor.close()
-        print("✅ Database tables verified/created successfully.")
+        print("[SUCCESS] Database tables verified/created successfully.")
     except Exception as e:
-        print(f"⚠️  Table init warning: {e}")
+        print(f"[WARNING] Table init warning: {e}")
 
 
 with app.app_context():
