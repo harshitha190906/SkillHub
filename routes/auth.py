@@ -58,10 +58,13 @@ def login():
 
     if request.method == "POST":
 
-        fullname = request.form["fullname"].strip()
+        identifier = request.form["fullname"].strip()
         password = request.form["password"]
 
-        user = User.get_user_by_fullname(mysql, fullname)
+        # Allow logging in by either Username/Fullname or Email address
+        user = User.get_user_by_fullname(mysql, identifier)
+        if not user:
+            user = User.get_user_by_email(mysql, identifier)
 
         if user and check_password_hash(user[3], password):
 
