@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from flask_mysqldb import MySQL
+import pymysql
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
@@ -46,37 +46,53 @@ class SQLiteConnWrapper:
 
 class SmartMySQL:
     """
-    A smart database connector for Flask that attempts to connect via Flask-MySQLdb.
+    A pure-Python database connector for Flask that attempts to connect to MySQL using PyMySQL.
     If MySQL server is unavailable or connection fails, it seamlessly falls back
-    to a local SQLite database (skillhub.db).
+    to a local SQLite database (skillhub.db or /tmp/skillhub.db on Vercel).
     """
 
     def __init__(self, app=None):
         self.app = app
-        self.flask_mysql = MySQL(app) if app else None
+        self._mysql_conn = None
         self._sqlite_wrapper = None
         self._using_sqlite = False
+        if app is not None:
+            self.init_app(app)
 
     def init_app(self, app):
         self.app = app
-        self.flask_mysql = MySQL(app)
 
     @property
     def connection(self):
         if self._using_sqlite and self._sqlite_wrapper:
             return self._sqlite_wrapper
 
-        if self.flask_mysql:
+        if self.app and not self._using_sqlite:
             try:
-                conn = self.flask_mysql.connection
-                if conn:
-                    cur = conn.cursor()
+                host = self.app.config.get("MYSQL_HOST")
+                port = int(self.app.config.get("MYSQL_PORT") or 3306)
+                user = self.app.config.get("MYSQL_USER")
+                password = self.app.config.get("MYSQL_PASSWORD") or ""
+                db = self.app.config.get("MYSQL_DB")
+
+                if host and user and db:
+                    if self._mysql_conn is None:
+                        self._mysql_conn = pymysql.connect(
+                            host=host,
+                            port=port,
+                            user=user,
+                            password=password,
+                            database=db,
+                            connect_timeout=5
+                        )
+                    cur = self._mysql_conn.cursor()
                     cur.execute("SELECT 1")
                     cur.close()
-                    return conn
+                    return self._mysql_conn
             except Exception as e:
                 print(f"[INFO] MySQL connection unavailable ({e}). Falling back to local SQLite database.")
                 self._using_sqlite = True
+                self._mysql_conn = None
 
         if self._sqlite_wrapper is None:
             if os.getenv("VERCEL"):

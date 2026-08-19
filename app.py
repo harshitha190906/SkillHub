@@ -10,7 +10,6 @@ from flask import (
     request,
     flash
 )
-from flask_mysqldb import MySQL
 import os
 # pyrefly: ignore [missing-import]
 from werkzeug.utils import secure_filename
